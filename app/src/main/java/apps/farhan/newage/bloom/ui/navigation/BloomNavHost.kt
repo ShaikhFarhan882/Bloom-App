@@ -48,7 +48,13 @@ fun BloomNavHost() {
             )
         }
         composable(Routes.HOME) {
-            HomeScreen()
+            HomeScreen(
+                onSignedOut = {
+                    navController.navigate(Routes.ONBOARDING) {
+                        popUpTo(Routes.HOME) { inclusive = true }
+                    }
+                },
+            )
         }
     }
 }

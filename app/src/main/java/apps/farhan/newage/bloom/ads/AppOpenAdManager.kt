@@ -149,4 +149,6 @@ class AppOpenAdManager(private val adUnitId: String) :
     private companion object {
         const val AD_EXPIRY_MS = 4 * 60 * 60 * 1000L // App Open ads expire after 4 hours
     }
+
+    fun disableForegroundAds() { foregroundAdsEnabled = false }
 }

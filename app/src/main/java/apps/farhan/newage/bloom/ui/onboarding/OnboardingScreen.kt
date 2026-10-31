@@ -326,7 +326,7 @@ private fun StepHeader(title: String, subtitle: String, icon: ImageVector? = nul
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TimePickerDialog(
+internal fun TimePickerDialog(
     initialHour: Int,
     initialMinute: Int,
     onConfirm: (Int, Int) -> Unit,
@@ -347,7 +347,7 @@ private fun TimePickerDialog(
     )
 }
 
-private fun formatTime(hour: Int, minute: Int): String {
+internal fun formatTime(hour: Int, minute: Int): String {
     val hour12 = if (hour % 12 == 0) 12 else hour % 12
     val suffix = if (hour < 12) "AM" else "PM"
     return "%02d:%02d %s".format(hour12, minute, suffix)
