@@ -9,6 +9,9 @@ import apps.farhan.newage.bloom.ui.home.HomeScreen
 import apps.farhan.newage.bloom.ui.onboarding.OnboardingRoute
 import apps.farhan.newage.bloom.ui.splash.SplashRoute
 
+import androidx.compose.ui.platform.LocalContext
+import apps.farhan.newage.bloom.appContainer
+
 object Routes {
     const val SPLASH = "splash"
     const val ONBOARDING = "onboarding"
@@ -18,6 +21,7 @@ object Routes {
 @Composable
 fun BloomNavHost() {
     val navController = rememberNavController()
+    val context = LocalContext.current
 
     NavHost(navController = navController, startDestination = Routes.SPLASH) {
         composable(Routes.SPLASH) {
@@ -35,6 +39,8 @@ fun BloomNavHost() {
         composable(Routes.ONBOARDING) {
             OnboardingRoute(
                 onFinished = {
+                    // From now on, background -> foreground may show the App Open Ad
+                    context.appContainer().appOpenAdManager.enableForegroundAds(context)
                     navController.navigate(Routes.HOME) {
                         popUpTo(Routes.ONBOARDING) { inclusive = true }
                     }
@@ -46,3 +52,4 @@ fun BloomNavHost() {
         }
     }
 }
+
