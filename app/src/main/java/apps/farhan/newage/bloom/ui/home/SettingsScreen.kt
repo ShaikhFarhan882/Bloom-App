@@ -1,6 +1,5 @@
 package apps.farhan.newage.bloom.ui.home
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -9,17 +8,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apps.farhan.newage.bloom.ui.components.*
-import apps.farhan.newage.bloom.ui.onboarding.TimePickerDialog
 import apps.farhan.newage.bloom.ui.onboarding.TrackItem
 import apps.farhan.newage.bloom.ui.onboarding.formatTime
 
@@ -29,13 +25,12 @@ fun SettingsScreen(
     onTrackToggle: (TrackItem, Boolean) -> Unit,
     onTargetChange: (GoalType, Int) -> Unit,
     onNotifications: (Boolean) -> Unit,
-    onReminderTime: (Int, Int) -> Unit,
+    onReminderClick: () -> Unit,
+    onPreviewClick: () -> Unit,
     onEditProfile: () -> Unit,
     onSignOut: () -> Unit,
 ) {
-    val context = LocalContext.current
     val muted = MaterialTheme.colorScheme.onSurfaceVariant
-    var showTimePicker by rememberSaveable { mutableStateOf(false) }
 
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState())
@@ -51,7 +46,10 @@ fun SettingsScreen(
                     Spacer(Modifier.width(12.dp))
                     Column {
                         Text(state.userName, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
-                        Text("PCOS journey · Not set", fontSize = 12.sp, color = muted)
+                        Text(
+                            "PCOS journey · ${state.journeyStage?.title ?: "Not set"}",
+                            fontSize = 12.sp, color = muted,
+                        )
                     }
                 }
                 SettingsDivider()
@@ -63,7 +61,10 @@ fun SettingsScreen(
         BloomCard {
             Column {
                 TRACKING_DISPLAY_ORDER.forEachIndexed { i, item ->
-                    Row(Modifier.padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
                         IconBadge(item.icon, item.color, badgeSize = 32.dp)
                         Spacer(Modifier.width(12.dp))
                         Text(item.title, fontSize = 14.sp, modifier = Modifier.weight(1f))
@@ -83,7 +84,10 @@ fun SettingsScreen(
             Column {
                 GoalType.entries.forEachIndexed { i, goal ->
                     val target = state.target(goal)
-                    Row(Modifier.padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
                         IconBadge(goal.icon, goal.color, badgeSize = 32.dp)
                         Spacer(Modifier.width(12.dp))
                         Text(goal.title, fontSize = 14.sp, modifier = Modifier.weight(1f))
@@ -101,23 +105,28 @@ fun SettingsScreen(
 
         BloomCard {
             Column {
-                Row(Modifier.padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     Column(Modifier.weight(1f)) {
                         Text("Notifications", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                         Text("Daily reminders to log", fontSize = 12.sp, color = muted)
                     }
-                    Switch(checked = state.notificationsOn, onCheckedChange = onNotifications, colors = bloomSwitchColors())
+                    Switch(
+                        checked = state.notificationsOn,
+                        onCheckedChange = onNotifications,
+                        colors = bloomSwitchColors(),
+                    )
                 }
                 SettingsDivider()
                 SettingsRow(
-                    "Reminder time", subtitle = formatTime(state.reminderHour, state.reminderMinute),
-                    onClick = { showTimePicker = true },
+                    "Reminder time",
+                    subtitle = formatTime(state.reminderHour, state.reminderMinute),
+                    onClick = onReminderClick,
                 )
                 SettingsDivider()
-                SettingsRow(
-                    "Live notification preview", subtitle = "See lock-screen updates",
-                    onClick = { Toast.makeText(context, "Coming soon", Toast.LENGTH_SHORT).show() },
-                )
+                SettingsRow("Live notification preview", subtitle = "See lock-screen updates", onClick = onPreviewClick)
                 SettingsDivider()
                 Row(Modifier.fillMaxWidth().padding(14.dp)) {
                     Text("App version", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
@@ -131,15 +140,6 @@ fun SettingsScreen(
             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
             shape = RoundedCornerShape(14.dp),
         ) { Text("Sign out") }
-    }
-
-    if (showTimePicker) {
-        TimePickerDialog(
-            initialHour = state.reminderHour,
-            initialMinute = state.reminderMinute,
-            onConfirm = { h, m -> onReminderTime(h, m); showTimePicker = false },
-            onDismiss = { showTimePicker = false },
-        )
     }
 }
 

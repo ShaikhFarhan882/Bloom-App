@@ -66,6 +66,20 @@ enum class HomeTab(val label: String, val icon: ImageVector) {
     SETTINGS("Settings", Icons.Outlined.Settings),
 }
 
+enum class JourneyStage(val title: String, val subtitle: String) {
+    DIAGNOSED("Diagnosed", "I have a confirmed PCOS diagnosis"),
+    SUSPECTED("Suspected", "A doctor mentioned it, not confirmed"),
+    EXPLORING("Exploring", "I think I might have symptoms"),
+    NOT_SURE("Not sure yet", "I just want to learn more"),
+}
+
+enum class SymptomCategory(val label: String, val icon: ImageVector, val options: List<String>) {
+    BLOATING("Bloating", Icons.Outlined.Cloud, listOf("None", "Mild", "Moderate", "Severe")),
+    SKIN("Skin & acne", Icons.Outlined.AutoAwesome, listOf("Clear", "Mild", "Moderate", "Flare-up")),
+    MOOD("Mood", Icons.Outlined.SentimentSatisfied, listOf("Great", "Okay", "Low", "Very low")),
+    SLEEP_QUALITY("Sleep quality", Icons.Outlined.Bedtime, listOf("Great", "Okay", "Poor", "Very poor")),
+}
+
 data class HomeUiState(
     val userName: String = "",
     val tracked: Set<TrackItem> = TrackItem.entries.toSet(),
@@ -76,6 +90,9 @@ data class HomeUiState(
     val reminderHour: Int = 8,
     val reminderMinute: Int = 0,
     val tipVisible: Boolean = true,
+    val journeyStage: JourneyStage? = null,
+    val lastPeriodDay: Long? = null,
+    val symptoms: Map<SymptomCategory, Int> = emptyMap()
 ) {
     fun current(goal: GoalType): Int =
         if (goal == GoalType.MEALS) meals.size else progress[goal] ?: 0

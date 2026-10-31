@@ -77,4 +77,17 @@ class HomeViewModel(private val repo: UserPreferencesRepository) : ViewModel() {
     private fun persist(block: suspend () -> Unit) {
         viewModelScope.launch { try { block() } catch (_: IOException) { } }
     }
+
+    fun saveProfile(name: String, stage: JourneyStage?) {
+        setName(name)
+        _state.update { it.copy(journeyStage = stage) }
+    }
+
+    fun setLastPeriod(day: Long) = _state.update { it.copy(lastPeriodDay = day) }
+
+    fun setSymptom(category: SymptomCategory, index: Int) = _state.update { s ->
+        // tapping the selected option again clears it
+        val next = if (s.symptoms[category] == index) s.symptoms - category else s.symptoms + (category to index)
+        s.copy(symptoms = next)
+    }
 }

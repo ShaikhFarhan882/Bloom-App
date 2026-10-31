@@ -17,6 +17,8 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import apps.farhan.newage.bloom.ads.AdaptiveBanner
 import apps.farhan.newage.bloom.appContainer
 
+private enum class OtherSheet { CYCLE, SYMPTOMS, EDIT_PROFILE, REMINDER, NOTIFICATION_PREVIEW }
+
 @Composable
 fun HomeScreen(onSignedOut: () -> Unit) {
     val container = LocalContext.current.appContainer()
@@ -27,7 +29,7 @@ fun HomeScreen(onSignedOut: () -> Unit) {
 
     var tab by rememberSaveable { mutableStateOf(HomeTab.DASHBOARD) }
     var goalSheet by rememberSaveable { mutableStateOf<GoalType?>(null) }
-    var showEditProfile by rememberSaveable { mutableStateOf(false) }
+    var otherSheet by rememberSaveable { mutableStateOf<OtherSheet?>(null) }
 
     BackHandler(enabled = tab != HomeTab.DASHBOARD) { tab = HomeTab.DASHBOARD }
 
@@ -48,6 +50,8 @@ fun HomeScreen(onSignedOut: () -> Unit) {
                     state = state,
                     onOpenGoal = { goalSheet = it },
                     onGoTab = { tab = it },
+                    onOpenCycle = { otherSheet = OtherSheet.CYCLE },
+                    onOpenSymptoms = { otherSheet = OtherSheet.SYMPTOMS },
                     onStartHere = {
                         state.activeGoals
                             .firstOrNull { state.current(it) < state.target(it) }
@@ -56,15 +60,21 @@ fun HomeScreen(onSignedOut: () -> Unit) {
                     onTipDone = vm::dismissTip,
                     onTipLater = vm::dismissTip,
                 )
-                HomeTab.INSIGHTS -> InsightsScreen(state)
+                HomeTab.INSIGHTS -> InsightsScreen(
+                    state = state,
+                    onOpenCycle = { otherSheet = OtherSheet.CYCLE },
+                    onOpenSymptoms = { otherSheet = OtherSheet.SYMPTOMS },
+                    onOpenGoal = { goalSheet = it },
+                )
                 HomeTab.LEARN -> LearnScreen()
                 HomeTab.SETTINGS -> SettingsScreen(
                     state = state,
                     onTrackToggle = vm::setTracking,
                     onTargetChange = vm::changeTarget,
                     onNotifications = vm::setNotifications,
-                    onReminderTime = vm::setReminderTime,
-                    onEditProfile = { showEditProfile = true },
+                    onReminderClick = { otherSheet = OtherSheet.REMINDER },
+                    onPreviewClick = { otherSheet = OtherSheet.NOTIFICATION_PREVIEW },
+                    onEditProfile = { otherSheet = OtherSheet.EDIT_PROFILE },
                     onSignOut = {
                         container.appOpenAdManager.disableForegroundAds()
                         vm.signOut(onSignedOut)
@@ -87,17 +97,21 @@ fun HomeScreen(onSignedOut: () -> Unit) {
                 goal = goal,
                 current = state.current(goal),
                 target = state.target(goal),
-                onSave = { vm.setProgress(goal, it) },
+                onChange = { vm.setProgress(goal, it) },
+                onOpenSettings = { goalSheet = null; tab = HomeTab.SETTINGS },
                 onDismiss = { goalSheet = null },
             )
         }
     }
-    if (showEditProfile) {
-        EditProfileSheet(
-            name = state.userName,
-            onSave = vm::setName,
-            onDismiss = { showEditProfile = false },
-        )
+
+    val closeOther = { otherSheet = null }
+    when (otherSheet) {
+        OtherSheet.CYCLE -> CycleLogSheet(state.lastPeriodDay, vm::setLastPeriod, closeOther)
+        OtherSheet.SYMPTOMS -> SymptomsSheet(state.symptoms, vm::setSymptom, closeOther)
+        OtherSheet.EDIT_PROFILE -> EditProfileSheet(state.userName, state.journeyStage, vm::saveProfile, closeOther)
+        OtherSheet.REMINDER -> ReminderTimeSheet(state.reminderHour, state.reminderMinute, vm::setReminderTime, closeOther)
+        OtherSheet.NOTIFICATION_PREVIEW -> NotificationPreviewSheet(state, closeOther)
+        null -> Unit
     }
 }
 
