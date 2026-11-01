@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bloom_splash_bg">#FCFAF8</color>
+
+    <style name="Theme.Bloom.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/bloom_splash_bg</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_bloom_splash</item>
+        <item name="postSplashScreenTheme">@style/Theme.Bloom</item>
+    </style>
+</resources>

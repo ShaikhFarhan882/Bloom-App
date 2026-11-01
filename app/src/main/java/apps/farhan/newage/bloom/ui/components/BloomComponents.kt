@@ -37,6 +37,9 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import apps.farhan.newage.bloom.R
 
 @Composable
 fun BloomPrimaryButton(
@@ -97,25 +100,13 @@ fun StepProgressBar(current: Int, total: Int, modifier: Modifier = Modifier) {
     }
 }
 
-/** Simple four-petal flower drawn with Canvas. Replace with the Figma SVG/vector if exported. */
 @Composable
 fun BloomLogo(modifier: Modifier = Modifier, logoSize: Dp = 88.dp) {
-    val petal = MaterialTheme.colorScheme.primary
-    val core = MaterialTheme.colorScheme.primaryContainer
-    Canvas(modifier = modifier.size(logoSize)) {
-        val c = center
-        val r = size.minDimension / 4f
-        listOf(0f, 90f, 180f, 270f).forEach { angle ->
-            rotate(degrees = angle, pivot = c) {
-                drawCircle(
-                    color = petal.copy(alpha = 0.85f),
-                    radius = r,
-                    center = Offset(c.x, c.y - r),
-                )
-            }
-        }
-        drawCircle(color = core, radius = r * 0.45f, center = c)
-    }
+    Image(
+        painter = painterResource(R.drawable.ic_bloom_logo),
+        contentDescription = "Bloom logo",
+        modifier = modifier.size(logoSize),
+    )
 }
 
 @Composable

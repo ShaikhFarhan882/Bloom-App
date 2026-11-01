@@ -28,7 +28,6 @@ fun BloomNavHost() {
             SplashRoute(
                 onResolved = { onboardingDone ->
                     // First launch -> Onboarding. Returning user -> Home.
-                    // (App Open Ad for returning users plugs in here in the next step.)
                     val target = if (onboardingDone) Routes.HOME else Routes.ONBOARDING
                     navController.navigate(target) {
                         popUpTo(Routes.SPLASH) { inclusive = true }
